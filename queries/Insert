@@ -1,0 +1,21 @@
+INSERT INTO feedsources(name, feed_url, category)
+VALUES ('CNN', 'http://rss.cnn.com/rss/cnn_topstories.rss', 'Top Stories'),
+('CNN', 'http://rss.cnn.com/rss/cnn_world.rss', 'World'),
+('CNN', 'http://rss.cnn.com/rss/cnn_us.rss', 'U.S.'),
+('CNN', 'http://rss.cnn.com/rss/money_latest.rss', 'Business'),
+('CNN', 'http://rss.cnn.com/rss/cnn_allpolitics.rss', 'Politics'),
+('CNN', 'http://rss.cnn.com/rss/cnn_tech.rss', 'Technology'),
+('CNN', 'http://rss.cnn.com/rss/cnn_health.rss', 'Health'),
+('FOX', 'http://feeds.foxnews.com/foxnews/most-popular', 'Most Popular'),
+('FOX', 'http://feeds.foxnews.com/foxnews/world', 'World'),
+('FOX', 'http://feeds.foxnews.com/foxnews/national', 'U.S.'),
+('FOX', 'http://feeds.foxnews.com/foxnews/politics', 'Politics'),
+('FOX', 'http://feeds.foxnews.com/foxnews/tech', 'Technology'),
+('FOX', 'http://feeds.foxnews.com/foxnews/health', 'Health'),
+('FOX', 'http://feeds.foxnews.com/foxnews/opinion', 'Opinion')
+
+CNN Entry Keys:
+title, link, pubDate, content, contentSnippet, guid, isoDate
+
+FOX Entry Keys:
+creator, title, link, pubDate, content, contentSnippet, guid, categories, isoDate

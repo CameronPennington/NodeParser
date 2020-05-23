@@ -21,7 +21,7 @@ const getSources = async () => {
 //for each record, pass in the url and retrieve the items
 const getFeedItems = async (feedURL) => {
 	const feed = await parser.parseURL(feedURL);
-	// console.log(typeof feed.items);
+
 	return feed.items;
 };
 
@@ -30,32 +30,36 @@ const fetchLink = async (link) => {
 	return fetchedLink.data;
 };
 
-const getAllEntriesFromSingleSource = async (source) => {};
+const formatEntries = async (feedItems) => {
+	feedItems.map((item) => {
+		return {
+			feedsourceId: id,
+			url: item.link,
+			title: item.title,
+			id_on_feed: item.guid,
+			published_date: item.pubDate,
+		};
+	});
+};
 
 const getAllEntriesFromAllSources = async (sources) => {
-	let entries = [];
-	sources.forEach(async (source) => {
-		//find latest date for source?
-		const id = source.id;
-		const singleFeedItems = await getFeedItems(source.url);
+	let entryCollector = [];
 
-		const formattedSingleFeedItems = singleFeedItems.map((entry) => {
-			return {
-				feedsourceId: id,
-				url: entry.link,
-				title: entry.title,
-				id_on_feed: entry.guid,
-				published_date: entry.pubDate,
-			};
-		});
+	for (const source of sources) {
+		let items = await getFeedItems(source.url);
+		tempSources.push(items);
+	}
 
-		formattedSingleFeedItems.forEach((entry) => {
-			entries.push(entry);
-		});
-	});
-
-	return entries;
+	console.log(entryCollector);
 };
+
+// return {
+// 	feedsourceId: id,
+// 	url: entry.link,
+// 	title: entry.title,
+// 	id_on_feed: entry.guid,
+// 	published_date: entry.pubDate,
+// };
 //save the datetime of the latest post, and filter items so that only new entries are included
 
 //prune and push items onto entries array

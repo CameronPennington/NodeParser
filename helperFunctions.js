@@ -25,48 +25,61 @@ const getFeedItems = async (feedURL) => {
 	return feed.items;
 };
 
-const fetchLink = async (link) => {
-	const fetchedLink = await axios.get(link);
-	return fetchedLink.data;
+const fetchLinks = async (items) => {
+	let contentCollector = [];
+
+	for await (let item of items) {
+		const content = await axios.get(item.url);
+		console.log(content.data);
+		contentCollector.push(content.data);
+	}
+	//need to reverse order because push adds items at the end
+	return contentCollector.reverse();
 };
 
-const formatEntries = async (feedItems) => {
-	feedItems.map((item) => {
+const formatItems = async (items) => {
+	const formattedItems = await items.map((item) => {
 		return {
-			feedsourceId: id,
+			feedsourceId: item.id,
 			url: item.link,
 			title: item.title,
 			id_on_feed: item.guid,
 			published_date: item.pubDate,
 		};
 	});
+	return formattedItems;
 };
 
-const getAllEntriesFromAllSources = async (sources) => {
+const filterItems = (items) => {
+	const filteredItems = items.filter(
+		(item) => !item.link.includes("video") && !item.link.includes("live-news")
+	);
+	console.log(filteredItems);
+	return filteredItems;
+};
+
+const getAllEntriesFromAllSources = async () => {
+	const sources = await getSources();
 	let entryCollector = [];
 
 	for (const source of sources) {
+		//get items
 		let items = await getFeedItems(source.url);
-		tempSources.push(items);
+		//filter items
+		let filteredItems = await filterItems(items);
+		//format items
+		let formattedItems = await formatItems(filteredItems);
+		//retrieve full content
+		let content = await fetchLinks(formattedItems);
+		// console.log(content)
+		//merge with formatted items
+
+		// entryCollector.push(formattedItemsWithFullContent);
 	}
 
-	console.log(entryCollector);
+	return entryCollector.flat();
 };
 
-// return {
-// 	feedsourceId: id,
-// 	url: entry.link,
-// 	title: entry.title,
-// 	id_on_feed: entry.guid,
-// 	published_date: entry.pubDate,
-// };
-//save the datetime of the latest post, and filter items so that only new entries are included
-
-//prune and push items onto entries array
-
 module.exports = {
-	getFeedItems,
-	fetchLink,
-	getSources,
 	getAllEntriesFromAllSources,
 };

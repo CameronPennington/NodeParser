@@ -72,13 +72,15 @@ const getAllEntriesFromAllSources = async () => {
 		//retrieve full content
 		let content = await fetchLinks(formattedItems);
 		// console.log(content)
-		//merge with formatted items
+		//TODO: merge with formatted items
 
 		// entryCollector.push(formattedItemsWithFullContent);
 	}
 
 	return entryCollector.flat();
 };
+
+//TODO: bulk create records
 
 module.exports = {
 	getAllEntriesFromAllSources,

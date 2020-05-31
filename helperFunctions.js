@@ -4,6 +4,8 @@ const { db } = require("./config/database");
 const FeedSource = require("./config/models").FeedSource;
 const Entry = require("./config/models").Entry;
 const axios = require("axios");
+const fs = require("fs");
+const cheerio = require("cheerio");
 
 //Retrieve all records in feedsource table
 const getSources = async () => {
@@ -27,11 +29,22 @@ const getFeedItems = async (feedURL) => {
 
 const fetchLinks = async (items) => {
 	let contentCollector = [];
-
+	let i = 0;
 	for await (let item of items) {
-		const content = await axios.get(item.url);
-		console.log(content.data);
-		contentCollector.push(content.data);
+		let content;
+
+		try {
+			content = await axios.get(item.url);
+		} catch (err) {
+			content = { data: "Content could not be retrieved" };
+		}
+		content = await JSON.stringify(content.data);
+		fs.writeFile(`content${i}`, content, (err) => {
+			if (err) console.log(err);
+		});
+		i++;
+
+		contentCollector.push(content);
 	}
 	//need to reverse order because push adds items at the end
 	return contentCollector.reverse();
@@ -54,7 +67,7 @@ const filterItems = (items) => {
 	const filteredItems = items.filter(
 		(item) => !item.link.includes("video") && !item.link.includes("live-news")
 	);
-	console.log(filteredItems);
+	// console.log(filteredItems);
 	return filteredItems;
 };
 
@@ -62,7 +75,7 @@ const getAllEntriesFromAllSources = async () => {
 	const sources = await getSources();
 	let entryCollector = [];
 
-	for (const source of sources) {
+	for (let source of sources) {
 		//get items
 		let items = await getFeedItems(source.url);
 		//filter items
@@ -71,8 +84,11 @@ const getAllEntriesFromAllSources = async () => {
 		let formattedItems = await formatItems(filteredItems);
 		//retrieve full content
 		let content = await fetchLinks(formattedItems);
-		// console.log(content)
-		//TODO: merge with formatted items
+		// TODO: Use cheerio to trim content
+
+		let formattedItemsWithFullContent = formattedItems.map((entry, i) => {
+			return (entry.content = content[i]);
+		});
 
 		// entryCollector.push(formattedItemsWithFullContent);
 	}
